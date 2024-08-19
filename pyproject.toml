@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "fasthtml-next"
+version = "0.1.0"
+description = "A Next.js like framework to build webapps using fasthtml using python."
+authors = ["Jose Antonio Dominguez <chamot11@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+python-fasthtml = "^0.4.4"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
