@@ -6,11 +6,7 @@ It's inspired by [Next.js](https://nextjs.org) App approach.
 
 ## Usage
 
-```
-mkdir app
-```
-
-```
+```python
 from fasthtml_extn import create_app, serve
 
 app, rt = create_app(live=False)
