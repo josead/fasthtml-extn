@@ -14,8 +14,6 @@ app, rt = create_app(live=False)
 serve()
 ```
 
-```
-
 
 
 
