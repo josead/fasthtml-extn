@@ -47,9 +47,9 @@ serve()
 
 ## Contributing
 
-We welcome contributions from the community! If you have any bug reports, feature requests, or pull requests, please submit them to our [GitHub repository](https://github.com/chamot11/fasthtml-extn).
+We welcome contributions from the community! If you have any bug reports, feature requests, or pull requests, please submit them to our [GitHub repository](https://github.com/josead/fasthtml-extn).
 
 ## License
 
-FastHTML-Next is released under the MIT License. See the [LICENSE](https://github.com/chamot11/fasthtml-extn/LICENSE) file for more information.
+FastHTML-Next is released under the MIT License. See the [LICENSE](https://github.com/josead/fasthtml-extn/LICENSE) file for more information.
 ```
