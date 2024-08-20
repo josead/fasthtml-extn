@@ -36,6 +36,7 @@ serve()
 - [x] Route expected errors like `app/**/*/except.py`
 - [] Route not found like `app/**/*/not_found.py`
 - [] Route apis like `app/**/*/router.py`
+- [] Add more tests
 
 ## Ideas:
 
