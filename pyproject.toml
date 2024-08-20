@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "fasthtml-next"
+name = "fasthtml_extn"
 version = "0.1.0"
-description = "A Next.js like framework to build webapps using fasthtml using python."
+description = "An fasthtml extension framework to build webapps using python."
 authors = ["Jose Antonio Dominguez <chamot11@gmail.com>"]
 readme = "README.md"
 

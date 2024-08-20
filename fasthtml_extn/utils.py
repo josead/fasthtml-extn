@@ -1,10 +1,11 @@
+import sys
 import os
 import logging
 from functools import reduce
 
-from components import NotFound
+from .components import NotFoundPage
 
-logger = logging.getLogger("app_logger")
+logger = logging.getLogger("fasthtml_extn")
 
 
 def get_path_and_route(
@@ -23,7 +24,7 @@ def get_path_and_route(
 
 def get_module(
     relative_path,
-    module_name="page",
+    module_name,
 ):
     if not relative_path:  # If the file is in the root of the app directory
         module_path = f"app.{module_name}"
@@ -70,7 +71,7 @@ def collect_feature_module(
         if feature_module_module:
             return feature_module_module
         current_dir = os.path.dirname(current_dir)
-    return NotFound
+    return NotFoundPage
 
 
 # Modify the register_module_page function
@@ -89,7 +90,7 @@ def register_module_page_layouts(
         page_init = getattr(module, "page")
 
         @rt(route, name=route)
-        async def get():
+        async def get():  # type: ignore
             try:
                 content = page_init(context)
                 return apply_layouts(content, layouts)
@@ -163,7 +164,37 @@ def process_directory_with_layout(
             )
 
 
-def create_routes(context):
-    app_dir = os.path.join(os.path.dirname(__file__), "app")
-
+def create_routes(context, app_dir):
     process_directory_with_layout(app_dir, context, app_dir=app_dir)
+
+
+def get_app_dir():
+    try:
+        startint_dir = os.path.dirname(sys.argv[0])
+        current_path = os.path.abspath(startint_dir)
+        app_dir = os.path.join(current_path, "app")
+        if os.path.isdir(app_dir):
+            return app_dir
+        return app_dir
+    except FileNotFoundError:
+        logger.error("Error: /app folder does not exist, make sure you create one.")
+        raise FileNotFoundError(
+            "Error: /app folder does not exist, make sure you create one."
+        )
+
+
+def create_app(*args, **kwargs):
+
+    app_dir = get_app_dir()
+    from fasthtml.common import FastHTMLWithLiveReload, FastHTML
+
+    if kwargs.pop("live", False):
+        app = FastHTMLWithLiveReload(*args, **kwargs)
+    kwargs.pop("reload_attempts", None)
+    kwargs.pop("reload_interval", None)
+
+    app = FastHTML(*args, **kwargs)
+
+    create_routes((app, app.route), app_dir)
+
+    return app, app.route
