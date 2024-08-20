@@ -45,5 +45,5 @@ We welcome contributions from the community! If you have any bug reports, featur
 
 ## License
 
-FastHTML-Next is released under the MIT License. See the [LICENSE](https://github.com/josead/fasthtml-extn/LICENSE) file for more information.
+FastHTML-Extn is released under the MIT License. See the [LICENSE](https://github.com/josead/fasthtml-extn/LICENSE) file for more information.
 ```
