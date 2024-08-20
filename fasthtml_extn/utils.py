@@ -169,18 +169,15 @@ def create_routes(context, app_dir):
 
 
 def get_app_dir():
-    try:
-        startint_dir = os.path.dirname(sys.argv[0])
-        current_path = os.path.abspath(startint_dir)
-        app_dir = os.path.join(current_path, "app")
-        if os.path.isdir(app_dir):
-            return app_dir
+    startint_dir = os.path.dirname(sys.argv[0])
+    current_path = os.path.abspath(startint_dir)
+    app_dir = os.path.join(current_path, "app")
+    if os.path.isdir(app_dir):
         return app_dir
-    except FileNotFoundError:
-        logger.error("Error: /app folder does not exist, make sure you create one.")
-        raise FileNotFoundError(
-            "Error: /app folder does not exist, make sure you create one."
-        )
+    else:
+        logger.warn("Automation: /app folder does not exist, creating one.")
+        os.makedirs(app_dir)
+    return app_dir
 
 
 def create_app(*args, **kwargs):

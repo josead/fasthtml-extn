@@ -4,13 +4,32 @@ FastHTML-Extn is a small and opinionated framework for building web applications
 
 It's inspired by [Next.js](https://nextjs.org) App approach.
 
+## Usage
+
+```
+mkdir app
+```
+
+```
+from fasthtml_extn import create_app, serve
+
+app, rt = create_app(live=False)
+
+serve()
+```
+
+```
+
+
+
+
 ## Features
 
 - Autogeneration of routes based on folder structure.
 - Layouts ...
 - Pages ...
 
-## TODOS:
+## TODO:
 
 - [x] Route pages like `app/**/*/page.py`
 - [x] Route layouts like `app/**/*/layout.py`
@@ -22,6 +41,8 @@ It's inspired by [Next.js](https://nextjs.org) App approach.
 
 - App Seeding with ootb working apps (similar to react-create-app)
 - Add more components as helpers. Maybe those should be on it's own library _help needed here_
+- Auto creation of folders: ask user from CLI
+- Create a CLI for adding pages or routes
 
 ## Contributing
 
@@ -30,3 +51,4 @@ We welcome contributions from the community! If you have any bug reports, featur
 ## License
 
 FastHTML-Next is released under the MIT License. See the [LICENSE](https://github.com/chamot11/fasthtml-extn/LICENSE) file for more information.
+```
