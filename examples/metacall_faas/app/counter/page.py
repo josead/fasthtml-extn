@@ -41,7 +41,7 @@ def page(context=None):
             header=P("Counter App", cls="text-lg font-semibold"),
             footer=Div(
                 P(
-                    "Click the + button to increment the counter, and the ⟲ button to reset it.",
+                    "Click the + button to increment the counter, and the [back] button to reset it.",
                     cls="w-40",
                 ),
                 Div(
