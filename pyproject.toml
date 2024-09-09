@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fasthtml_extn"
-version = "0.0.3"
+version = "0.0.4"
 description = "An fasthtml extension framework to build webapps using python."
 authors = ["Jose Antonio Dominguez <chamot11@gmail.com>"]
 readme = "README.md"
