@@ -26,8 +26,21 @@ jobs:
           python3 -m pip install --upgrade pip
           python3 -m pip install poetry
 
+      - name: Get release version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
+
+      - name: Check version consistency
+        run: |
+          PYPROJECT_VERSION=$(poetry version -s)
+          RELEASE_VERSION=${{ steps.get_version.outputs.VERSION }}
+          if [ "v$PYPROJECT_VERSION" != "$RELEASE_VERSION" ]; then
+            echo "Error: Version mismatch. pyproject.toml version ($PYPROJECT_VERSION) does not match release tag ($RELEASE_VERSION)"
+            exit 1
+          fi
+
       - name: Build and publish
         run: |
           poetry build
           poetry config pypi-token.pypi ${{ secrets.PYPI_TOKEN }}
-          poetry publish 
+          poetry publish
