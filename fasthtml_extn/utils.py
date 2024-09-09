@@ -33,7 +33,7 @@ def get_module(
     else:
         module_path = ".".join(["app"] + relative_path.split(os.sep) + [module_name])
     try:
-        print(module_path)
+        logger.debug(f"Importing module: {module_path}")
         return __import__(module_path, fromlist=[module_name])
     except ModuleNotFoundError:
         logger.debug(f"Warning: module_path: '{module_path}' does not exist")
@@ -191,7 +191,7 @@ def create_routes(context, app_dir):
     pages = process_directory_with_layout(app_dir, app_dir=app_dir)
 
     for page in pages:
-        print(f"Registering page: {page['route']}")
+        logger.info(f"Registering page: {page['route']}")
         register_module_page_layouts(**page, context=context)
 
 
@@ -246,7 +246,6 @@ def get_metacall_app_path(path: str, app_pages: AppPageDirectory):
         try:
             page_module = app_page["module"]
             content = page_module.page(app_page)
-            print(content)
 
             return apply_layouts(content, app_page["layouts"])
         except Exception as e:
