@@ -2,6 +2,8 @@ import sys
 import os
 import logging
 from functools import reduce
+from types import ModuleType
+from typing import Callable, NotRequired, TypedDict
 
 from .components import NotFoundPage
 
@@ -31,6 +33,7 @@ def get_module(
     else:
         module_path = ".".join(["app"] + relative_path.split(os.sep) + [module_name])
     try:
+        print(module_path)
         return __import__(module_path, fromlist=[module_name])
     except ModuleNotFoundError:
         logger.debug(f"Warning: module_path: '{module_path}' does not exist")
@@ -82,7 +85,7 @@ def register_module_page_layouts(
     relative_path,
     layouts,
     not_found,
-    _except,
+    exception,
 ):
     try:
         _, rt = context
@@ -96,7 +99,7 @@ def register_module_page_layouts(
                 return apply_layouts(content, layouts)
             except Exception as e:
                 logger.error(f"Error: /{relative_path} has an error: {e}")
-                return _except.error(e, context)
+                return exception.error(e, context)
 
         @rt("{}/{}".format(route, "{path:path}"), name=f"{route}_and_not_found")
         async def get(path: str):
@@ -105,7 +108,7 @@ def register_module_page_layouts(
                 return apply_layouts(content, layouts)
             except Exception as e:
                 logger.error(f"Error: /{relative_path} has an error: {e}")
-                return _except.page(context)
+                return exception.page(context)
 
         logger.info(f"Created route: {route}")
     except AttributeError as e:
@@ -129,13 +132,28 @@ def apply_layouts(
     return nest_layouts(content)()
 
 
+Route = str
+
+
+class AppPage(TypedDict):
+    route: Route
+    relative_path: str
+    layouts: list[Callable]
+    module: ModuleType
+    not_found: NotRequired[ModuleType]
+    exception: NotRequired[ModuleType]
+
+
+AppPageDirectory = dict[Route, AppPage]
+
+
 # Modify the process_directory function
 def process_directory_with_layout(
     directory,
-    context,
     base_route="",
     app_dir="",
-):
+) -> list[AppPage]:
+    pages = []
     for item in os.listdir(directory):
         item_path = os.path.join(directory, item)
         if os.path.isfile(item_path) and item == "page.py":
@@ -145,27 +163,36 @@ def process_directory_with_layout(
             if module:
                 layouts = collect_layouts(directory, app_dir)
                 not_found = collect_feature_module(directory, app_dir, "not_found")
-                _except = collect_feature_module(directory, app_dir, "except")
-                register_module_page_layouts(
-                    module,
-                    route,
-                    context,
-                    relative_path,
-                    layouts,
-                    not_found,
-                    _except,
-                )
+                exception = collect_feature_module(directory, app_dir, "exception")
+                pages = [
+                    *pages,
+                    {
+                        "relative_path": relative_path,
+                        "route": route,
+                        "layouts": layouts,
+                        "not_found": not_found,
+                        "exception": exception,
+                        "module": module,
+                    },
+                ]
         elif os.path.isdir(item_path) and not item.startswith("__"):
-            process_directory_with_layout(
-                item_path,
-                context,
-                os.path.join(base_route, item),
-                app_dir=app_dir,
-            )
+            pages = [
+                *pages,
+                *process_directory_with_layout(
+                    item_path,
+                    os.path.join(base_route, item),
+                    app_dir=app_dir,
+                ),
+            ]
+    return pages
 
 
 def create_routes(context, app_dir):
-    process_directory_with_layout(app_dir, context, app_dir=app_dir)
+    pages = process_directory_with_layout(app_dir, app_dir=app_dir)
+
+    for page in pages:
+        print(f"Registering page: {page['route']}")
+        register_module_page_layouts(**page, context=context)
 
 
 def get_app_dir():
@@ -187,11 +214,43 @@ def create_app(*args, **kwargs):
 
     if kwargs.pop("live", False):
         app = FastHTMLWithLiveReload(*args, **kwargs)
+    else:
+        app = FastHTML(*args, **kwargs)
     kwargs.pop("reload_attempts", None)
     kwargs.pop("reload_interval", None)
-
-    app = FastHTML(*args, **kwargs)
 
     create_routes((app, app.route), app_dir)
 
     return app, app.route
+
+
+def create_metacall_app(*args, **kwargs) -> AppPageDirectory:
+
+    app_dir = get_app_dir()
+
+    pages = process_directory_with_layout(app_dir, app_dir=app_dir)
+
+    pages = {page["route"]: page for page in pages}
+
+    return pages
+
+
+def get_metacall_app_path(path: str, app_pages: AppPageDirectory):
+
+    if path in app_pages:
+
+        app_page = app_pages[path]
+
+        if "exception" in app_page:
+            exception = app_page["exception"]
+        try:
+            page_module = app_page["module"]
+            content = page_module.page(app_page)
+            print(content)
+
+            return apply_layouts(content, app_page["layouts"])
+        except Exception as e:
+            logger.error(f"Error: /{app_page['relative_path']} has an error: {e}")
+            return exception.page(e)
+    else:
+        return NotFoundPage()
