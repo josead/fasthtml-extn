@@ -4,6 +4,12 @@ FastHTML-Extn is a small and opinionated framework for building web applications
 
 It's inspired by [Next.js](https://nextjs.org) App approach.
 
+## Install
+
+```shell
+pip install fasthtml-extn
+```
+
 ## Usage
 
 ```python
